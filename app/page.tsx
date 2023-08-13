@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Electronica from "../data/electronica";
 
 export default function Home() {
   const [content, setContent] = useState<string[]>([]);
@@ -34,8 +35,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log(content)
-  }, [content])
+    console.log(content);
+  }, [content]);
 
   return (
     <main>
@@ -44,6 +45,41 @@ export default function Home() {
         <div>
           {content.map((line, index) => (
             <div key={index}>{line}</div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 200, display: "flex" }}>
+          {Electronica.map((semester, index) => (
+            <div key={`semester_${index}`}>
+              {semester.courses.map(
+                (course: {
+                  name: string;
+                  code: number;
+                  optional?: boolean;
+                }) => (
+                  <div
+                    key={index}
+                    style={{
+                      width: 150,
+                      height: 150,
+                      margin: 12,
+                      border: "1px solid black",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      backgroundColor: course.optional ? "#EEE" : "",
+                    }}
+                  >
+                    <div>
+                      <div>{course.name}</div>
+
+                      <div>{course.code}</div>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
           ))}
         </div>
       </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import TagManager from "react-gtm-module";
+
 import Electronica from "../data/electronica";
 
 import animationStyles from "./animation.module.css";
@@ -108,13 +110,31 @@ export default function Home() {
     setFinalGrades({ ...finalGrades, ..._finalGrades });
   };
 
+  const getColor = (course: ICourse) => {
+    if (finalGrades[course.code]) {
+      return parseInt(finalGrades[course.code]) >= 60
+        ? styles.colors.primary
+        : "red";
+    }
+
+    return course.optional ? styles.colors.gray800 : "";
+  };
+
+  const initGTag = () => {
+    const tagManagerArgs = {
+      gtmId: "GTM-PPJ3BH23",
+    };
+
+    TagManager.initialize(tagManagerArgs);
+  };
+
   useEffect(() => {
     initGrades();
   }, [content]);
 
   useEffect(() => {
     if (Object.keys(grades).length === 0 || showAnimation === true) {
-      return
+      return;
     }
 
     setShowAnimation(true);
@@ -124,6 +144,10 @@ export default function Home() {
     setFinalesGradesForSemester(semesterReviewing - 1);
     animation();
   }, [semesterReviewing, showAnimation]);
+
+  useEffect(() => {
+    initGTag();
+  }, []);
 
   const styles = {
     colors: {
@@ -136,16 +160,6 @@ export default function Home() {
       maxWidth: 1080,
       margin: "0 auto",
     },
-  };
-
-  const getColor = (course: ICourse) => {
-    if (finalGrades[course.code]) {
-      return parseInt(finalGrades[course.code]) >= 60
-        ? styles.colors.primary
-        : "red";
-    }
-
-    return course.optional ? styles.colors.gray800 : "";
   };
 
   return (

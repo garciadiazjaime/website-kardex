@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Electronica from "../data/electronica";
 
+import animationStyles from "./animation.module.css";
+
 interface IGrades {
   [key: string]: string;
 }
@@ -16,6 +18,9 @@ interface ICourse {
 export default function Home() {
   const [content, setContent] = useState<string[]>([]);
   const [grades, setGrades] = useState<IGrades>({});
+  const [finalGrades, setFinalGrades] = useState<IGrades>({});
+  const [semesterReviewing, setSemesterReviewing] = useState<number>(1);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const fileHandler = (event: any) => {
     const file = event.target.files[0];
@@ -67,12 +72,58 @@ export default function Home() {
         }
       }
     }
+
     setGrades({ ...grades, ..._grades });
+  };
+
+  const animation = () => {
+    if (!showAnimation) {
+      return;
+    }
+
+    if (semesterReviewing > 8) {
+      setShowAnimation(false);
+      setSemesterReviewing(1);
+      return;
+    }
+
+    setTimeout(() => {
+      setSemesterReviewing(semesterReviewing + 1);
+    }, 1 * 1000);
+  };
+
+  const setFinalesGradesForSemester = (semester: number) => {
+    if (semester === 0) {
+      return;
+    }
+
+    const _finalGrades: IGrades = {};
+
+    Electronica[semester - 1].courses.map((course) => {
+      if (grades[course.code]) {
+        _finalGrades[course.code] = grades[course.code];
+      }
+    });
+
+    setFinalGrades({ ...finalGrades, ..._finalGrades });
   };
 
   useEffect(() => {
     initGrades();
   }, [content]);
+
+  useEffect(() => {
+    if (Object.keys(grades).length === 0 || showAnimation === true) {
+      return
+    }
+
+    setShowAnimation(true);
+  }, [grades]);
+
+  useEffect(() => {
+    setFinalesGradesForSemester(semesterReviewing - 1);
+    animation();
+  }, [semesterReviewing, showAnimation]);
 
   const styles = {
     colors: {
@@ -88,8 +139,8 @@ export default function Home() {
   };
 
   const getColor = (course: ICourse) => {
-    if (grades[course.code]) {
-      return parseInt(grades[course.code]) >= 60
+    if (finalGrades[course.code]) {
+      return parseInt(finalGrades[course.code]) >= 60
         ? styles.colors.primary
         : "red";
     }
@@ -137,36 +188,46 @@ export default function Home() {
             display: "flex",
           }}
         >
-          {Electronica.map((semester, index) => (
+          {Electronica.map((semester) => (
             <div key={`semester_${semester.name}`}>
+              <div
+                style={{ borderBottom: "1px solid black", textAlign: "center" }}
+              >
+                {semester.name}
+              </div>
               {semester.courses.map((course: ICourse) => (
                 <div
                   key={course.code}
                   style={{
                     width: (1080 - 12 * 8) / 8,
                     height: (1080 - 12 * 8) / 8,
-                    margin: 6,
+                    margin: "12px 6px",
                     border: "1px solid black",
                     backgroundColor: getColor(course),
+                    opacity: 0.8,
                     display: "flex",
                     alignItems: "center",
                     textAlign: "center",
                     justifyContent: "center",
+                    flexDirection: "column",
                   }}
+                  className={
+                    showAnimation && semester.name === semesterReviewing
+                      ? animationStyles.pulse
+                      : ""
+                  }
                 >
-                  <div>
-                    <div
-                      style={{
-                        wordBreak: "break-word",
-                        fontSize: ".9em",
-                        padding: 2,
-                      }}
-                    >
-                      {course.name}
-                    </div>
-
-                    <div>{course.code}</div>
+                  <div
+                    style={{
+                      wordBreak: "break-word",
+                      fontSize: ".9em",
+                      padding: 2,
+                    }}
+                  >
+                    {course.name}
                   </div>
+
+                  <div>{course.code}</div>
                 </div>
               ))}
             </div>

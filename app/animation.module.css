@@ -1,0 +1,22 @@
+.pulse {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    animation-name: pulse;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: white;
+    }
+
+    50% {
+        background-color: #565451;
+    }
+
+    100% {
+        background-color: white;
+    }
+}

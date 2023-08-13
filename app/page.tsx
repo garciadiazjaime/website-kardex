@@ -3,9 +3,19 @@
 import { useState, useEffect } from "react";
 import Electronica from "../data/electronica";
 
+interface IGrades {
+  [key: string]: string;
+}
+
+interface ICourse {
+  name: string;
+  code: number;
+  optional?: boolean;
+}
+
 export default function Home() {
   const [content, setContent] = useState<string[]>([]);
-  const [grades, setGrades] = useState({});
+  const [grades, setGrades] = useState<IGrades>({});
 
   const fileHandler = (event: any) => {
     const file = event.target.files[0];
@@ -40,7 +50,7 @@ export default function Home() {
     const courseRegex = /^\d{5}$/;
     const dateRegex = /^\d{4}\-\d{2}\-\d{2}$/;
 
-    const _grades = {};
+    const _grades: IGrades = {};
 
     for (let i = 0; i < content.length; i += 1) {
       const line = content[i];
@@ -77,9 +87,11 @@ export default function Home() {
     },
   };
 
-  const getColor = (course) => {
+  const getColor = (course: ICourse) => {
     if (grades[course.code]) {
-      return grades[course.code] >= 60 ? styles.colors.primary : "red";
+      return parseInt(grades[course.code]) >= 60
+        ? styles.colors.primary
+        : "red";
     }
 
     return course.optional ? styles.colors.gray800 : "";
@@ -102,9 +114,7 @@ export default function Home() {
       </header>
 
       <div style={{ ...styles.container, padding: "0 0 60px 0" }}>
-        <div
-          style={{ padding: 6, cursor: "pointer" }}
-        >
+        <div style={{ padding: 6, cursor: "pointer" }}>
           <label
             htmlFor="files"
             style={{ display: "inline-block", paddingRight: 20 }}
@@ -129,42 +139,36 @@ export default function Home() {
         >
           {Electronica.map((semester, index) => (
             <div key={`semester_${semester.name}`}>
-              {semester.courses.map(
-                (course: {
-                  name: string;
-                  code: number;
-                  optional?: boolean;
-                }) => (
-                  <div
-                    key={course.code}
-                    style={{
-                      width: (1080 - 12 * 8) / 8,
-                      height: (1080 - 12 * 8) / 8,
-                      margin: 6,
-                      border: "1px solid black",
-                      backgroundColor: getColor(course),
-                      display: "flex",
-                      alignItems: "center",
-                      textAlign: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div>
-                      <div
-                        style={{
-                          wordBreak: "break-word",
-                          fontSize: ".9em",
-                          padding: 2,
-                        }}
-                      >
-                        {course.name}
-                      </div>
-
-                      <div>{course.code}</div>
+              {semester.courses.map((course: ICourse) => (
+                <div
+                  key={course.code}
+                  style={{
+                    width: (1080 - 12 * 8) / 8,
+                    height: (1080 - 12 * 8) / 8,
+                    margin: 6,
+                    border: "1px solid black",
+                    backgroundColor: getColor(course),
+                    display: "flex",
+                    alignItems: "center",
+                    textAlign: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        wordBreak: "break-word",
+                        fontSize: ".9em",
+                        padding: 2,
+                      }}
+                    >
+                      {course.name}
                     </div>
+
+                    <div>{course.code}</div>
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           ))}
         </div>

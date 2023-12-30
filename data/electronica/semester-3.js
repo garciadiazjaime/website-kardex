@@ -30,7 +30,7 @@ const Semester = {
     {
       name: "Metodología Eléctrica",
       code: 36153,
-      credits: 7,
+      credits: 6,
     },
     {
       name: "Taller de Software para Ingeniería",

@@ -16,11 +16,13 @@ const Semester = {
       name: "Telecomunicaciones",
       code: 36186,
       credits: 6,
+      optional: true,
     },
     {
       name: "Control Avanzado",
       code: 36187,
       credits: 6,
+      optional: true,
     },
     {
       name: "Robótica",

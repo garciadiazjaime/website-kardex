@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import TagManager from "react-gtm-module";
+import async from "async";
 
 import Electronica from "../data/electronica";
 
@@ -15,6 +16,7 @@ interface ICourse {
   name: string;
   code: number;
   optional?: boolean;
+  credits: number;
 }
 
 export default function Home() {
@@ -41,15 +43,16 @@ export default function Home() {
   const readPDF = async (buffer: any) => {
     // @ts-ignore
     const loadingTask = pdfjsLib.getDocument(buffer);
-    loadingTask.promise.then((pdf: any) => {
-      for (let i = 1; i <= pdf.numPages; i += 1) {
-        pdf.getPage(i).then(async (page: any) => {
-          const textContent = await page.getTextContent();
-          const lines = textContent.items.map((item: any) => item.str);
+    loadingTask.promise.then(async (pdf: any) => {
+      const pages = Array.from({ length: pdf.numPages }, (v, i) => i);
+      await async.eachSeries(pages, async (i: number) => {
+        const page = await pdf.getPage(i + 1);
 
-          setContent([...content, ...lines]);
-        });
-      }
+        const textContent = await page.getTextContent();
+        const lines = textContent.items.map((item: any) => item.str);
+
+        setContent([...content, ...lines]);
+      });
     });
   };
 
@@ -224,6 +227,7 @@ export default function Home() {
                     textAlign: "center",
                     justifyContent: "center",
                     flexDirection: "column",
+                    position: "relative",
                   }}
                   className={
                     showAnimation && semester.name === semesterReviewing
@@ -242,6 +246,16 @@ export default function Home() {
                   </div>
 
                   <div>{course.code}</div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: 6,
+                      bottom: 0,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {course.credits}
+                  </div>
                 </div>
               ))}
             </div>
